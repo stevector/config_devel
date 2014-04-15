@@ -55,7 +55,7 @@ class ConfigDevelFileStorageSubscriber implements EventSubscriberInterface {
   public function onConfigRename(ConfigRenameEvent $event) {
     $config = $event->getConfig();
     $this->filestorage->write($config->getName(), $config->get());
-    $this->filestorage->delete($config->getOldName());
+    $this->filestorage->delete($event->getOldName());
   }
 
   /**
@@ -65,8 +65,7 @@ class ConfigDevelFileStorageSubscriber implements EventSubscriberInterface {
    *   The event to process.
    */
   public function onConfigDelete(ConfigCrudEvent $event) {
-    $config = $event->getConfig();
-    $this->filestorage->delete($config->getOldName());
+    $this->filestorage->delete($event->getConfig()->getName());
   }
 
   /**
