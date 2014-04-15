@@ -1,0 +1,14 @@
+services:
+  config_devel.filestorage_subscriber:
+    class: Drupal\config_devel\EventSubscriber\ConfigDevelFileStorageSubscriber
+    arguments: ['@config_devel.filestorage']
+    tags:
+      - { name: event_subscriber }
+  config_devel.filestorage:
+    class: Drupal\Core\Config\FileStorage
+    factory_service: config_devel.filestorage_factory
+    factory_method: get
+  config_devel.filestorage_factory:
+    class: Drupal\config_devel\Config\FileStorageFactory
+    arguments: ['@settings']
+

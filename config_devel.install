@@ -1,0 +1,13 @@
+<?php
+
+/**
+ * Implements hook_install().
+ */
+function config_devel_install() {
+  $config_storage = \Drupal::service('config.storage.active');
+  $config_devel_storage = \Drupal::service('config_devel.filestorage');
+  foreach ($config_storage->readMultiple($config_storage->listAll()) as $name => $data) {
+    $config_devel_storage->write($name, $data);
+  }
+}
+

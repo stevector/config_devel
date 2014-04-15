@@ -1,0 +1,6 @@
+name: Configuration development module
+type: module
+description: 'Helps developers work with configuration.'
+package: Configuration
+version: VERSION
+core: 8.x
