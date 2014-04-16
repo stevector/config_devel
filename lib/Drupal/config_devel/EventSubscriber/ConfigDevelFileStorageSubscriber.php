@@ -8,6 +8,8 @@
 namespace Drupal\config_devel\EventSubscriber;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Drupal\Core\Config\FileStorage;
 use Drupal\Core\Config\ConfigCrudEvent;
 use Drupal\Core\Config\ConfigRenameEvent;
@@ -78,12 +80,23 @@ class ConfigDevelFileStorageSubscriber implements EventSubscriberInterface {
   }
 
   /**
+   * React to Kernel::REQUEST event.
+   *
+   * @param \Symfony\Component\HttpKernel\Event\GetResponseEvent $event
+   *   The event to process.
+   */
+  public function onKernelRequest(GetResponseEvent $event) {
+    \Drupal::configFactory()->setOverrideState(TRUE);
+  }
+
+  /**
    * Registers the methods in this class that should be listeners.
    *
    * @return array
    *   An array of event listener definitions.
    */
   static function getSubscribedEvents() {
+    $events[KernelEvents::REQUEST][] = array('onKernelRequest');
     $events[ConfigEvents::SAVE][] = array('onConfigSave', 10);
     $events[ConfigEvents::DELETE][] = array('onConfigDelete', 10);
     $events[ConfigEvents::RENAME][] = array('onConfigRename', 10);

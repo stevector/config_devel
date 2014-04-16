@@ -11,4 +11,8 @@ services:
   config_devel.filestorage_factory:
     class: Drupal\config_devel\Config\FileStorageFactory
     arguments: ['@settings']
-
+  config_devel.config_factory_override:
+    class: Drupal\config_devel\Config\ConfigDevelConfigFactoryOverride
+    arguments: ['@config.storage.active', '@config_devel.filestorage', '@config.factory']
+    tags:
+      - { name: config.factory.override, priority: -254 }
