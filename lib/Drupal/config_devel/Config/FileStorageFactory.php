@@ -37,7 +37,7 @@ class FileStorageFactory {
    * @return \Drupal\Core\Config\FileStorage FileStorage
    */
   public function get() {
-    $config_devel_settings = $this->settings->get('config_devel');
+    $config_devel_settings = $this->settings->get('config_devel', array());
     $storage_dir = $this->settings->get('file_public_path', conf_path() . '/files') . '/config_devel';
     if (!empty($config_devel_settings['storage_dir'])) {
       $storage_dir = $config_devel_settings['storage_dir'];

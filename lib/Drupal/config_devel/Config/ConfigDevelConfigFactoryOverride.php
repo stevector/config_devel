@@ -7,6 +7,7 @@
 
 namespace Drupal\config_devel\Config;
 
+use Drupal\Component\Utility\Settings;
 use Drupal\Core\Config\Config;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Config\ConfigFactoryOverrideInterface;
@@ -39,6 +40,13 @@ class ConfigDevelConfigFactoryOverride implements ConfigFactoryOverrideInterface
   protected $configFactory;
 
   /**
+   * The settings array.
+   *
+   * @var \Drupal\Component\Utility\Settings
+   */
+  protected $settings;
+
+  /**
    * Constructs the ConfigDevelConfigFactoryOverride object.
    *
    * @param \Drupal\Core\Config\StorageInterface $active_storage
@@ -47,11 +55,14 @@ class ConfigDevelConfigFactoryOverride implements ConfigFactoryOverrideInterface
    *   The config_devel configuration storage engine.
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    *   The configuration factory.
+   * @param \Drupal\Component\Utility\Settings $settings
+   *   The settings array.
    */
-  public function __construct(StorageInterface $active_storage, StorageInterface $config_devel_storage, ConfigFactoryInterface $config_factory) {
+  public function __construct(StorageInterface $active_storage, StorageInterface $config_devel_storage, ConfigFactoryInterface $config_factory, Settings $settings) {
     $this->activeStorage = $active_storage;
     $this->configDevelStorage = $config_devel_storage;
     $this->configFactory = $config_factory;
+    $this->settings = $settings;
   }
 
   /**
@@ -59,6 +70,11 @@ class ConfigDevelConfigFactoryOverride implements ConfigFactoryOverrideInterface
    */
   public function loadOverrides($names) {
     $overrides = array();
+    $config_devel_settings = $this->settings->get('config_devel', array());
+    if (empty($config_devel_settings['write_back_to_active'])) {
+      return $overrides;
+    }
+
     $config_devel_configs = $this->configDevelStorage->readMultiple($names);
     foreach ($this->activeStorage->readMultiple($names) as $name => $active_config) {
       if (isset($config_devel_configs[$name]) && $config_devel_configs[$name] !== $active_config) {
