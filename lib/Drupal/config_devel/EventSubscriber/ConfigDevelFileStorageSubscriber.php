@@ -11,7 +11,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Yaml\Exception\DumpException;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
-use Drupal\Component\Utility\Settings;
+use Drupal\Core\Site\Settings;
 use Drupal\Core\Config\FileStorage;
 use Drupal\Core\Config\InstallStorage;
 use Drupal\Core\Config\Config;
@@ -43,7 +43,7 @@ class ConfigDevelFileStorageSubscriber implements EventSubscriberInterface {
   /**
    * The settings array.
    *
-   * @var \Drupal\Component\Utility\Settings
+   * @var \Drupal\Core\Site\Settings
    */
   protected $settings;
 

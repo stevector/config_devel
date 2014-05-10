@@ -7,7 +7,7 @@
 
 namespace Drupal\config_devel\Config;
 
-use Drupal\Component\Utility\Settings;
+use Drupal\Core\Site\Settings;
 use Drupal\Core\Config\Config;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Config\ConfigFactoryOverrideInterface;
@@ -55,7 +55,7 @@ class ConfigDevelConfigFactoryOverride implements ConfigFactoryOverrideInterface
    *   The config_devel configuration storage engine.
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    *   The configuration factory.
-   * @param \Drupal\Component\Utility\Settings $settings
+   * @param \Drupal\Core\Site\Settings $settings
    *   The settings array.
    */
   public function __construct(StorageInterface $active_storage, StorageInterface $config_devel_storage, ConfigFactoryInterface $config_factory, Settings $settings) {

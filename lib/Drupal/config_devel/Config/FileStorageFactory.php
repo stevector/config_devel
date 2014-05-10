@@ -7,7 +7,7 @@
 namespace Drupal\config_devel\Config;
 
 use Drupal\Core\Config\FileStorage;
-use Drupal\Component\Utility\Settings;
+use Drupal\Core\Site\Settings;
 
 /**
  * Provides a factory for creating devel config file storage objects.
@@ -17,7 +17,7 @@ class FileStorageFactory {
   /**
    * The settings array.
    *
-   * @var \Drupal\Component\Utility\Settings
+   * @var \Drupal\Core\Site\Settings
    */
   protected $settings;
 
