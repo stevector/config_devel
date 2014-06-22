@@ -93,4 +93,12 @@ class ConfigDevelConfigFactoryOverride implements ConfigFactoryOverrideInterface
     return '';
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function createConfigObject($name, $collection = '') {
+    // NFI, but i found some things in core that just return NULL, yolo.
+    return NULL;
+  }
+
 }
