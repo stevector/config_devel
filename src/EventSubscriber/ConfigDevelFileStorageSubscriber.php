@@ -68,7 +68,7 @@ class ConfigDevelFileStorageSubscriber implements EventSubscriberInterface {
    *   The config_devel configuration storage engine.
    * @param \Drupal\Core\Config\InstallStorage $default_storage
    *   The default configuration storage engine.
-   * @param \Drupal\Component\Utility\Settings $settings
+   * @param \Drupal\Core\Site\Settings $settings
    *   The settings array.
    * @param \Drupal\Core\Config\ConfigManagerInterface $config_manager
    *   The configuration manager.

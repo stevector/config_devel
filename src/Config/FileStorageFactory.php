@@ -7,42 +7,30 @@
 namespace Drupal\config_devel\Config;
 
 use Drupal\Core\Config\FileStorage;
+use Drupal\Core\DrupalKernel;
 use Drupal\Core\Site\Settings;
 
 /**
- * Provides a factory for creating devel config file storage objects.
+ * Provides a factory for creating file storage objects for config_devel.
  */
 class FileStorageFactory {
 
   /**
-   * The settings array.
+   * Creates a new file storage object.
    *
-   * @var \Drupal\Core\Site\Settings
-   */
-  protected $settings;
-
-  /**
-   * Constructs FileStorageFactory object.
+   * @param \Drupal\Core\Site\Settings $settings
+   *   The settings object.
+   * @param \Drupal\Core\DrupalKernel $kernel
+   *   The kernel.
    *
-   * @param \Drupal\Component\Utility\Settings $settings
-   *   The settings array.
+   * @return \Drupal\Core\Config\FileStorage
    */
-  function __construct(Settings $settings) {
-    $this->settings = $settings;
-  }
-
-  /**
-   * Returns a FileStorage object working with the active config directory.
-   *
-   * @return \Drupal\Core\Config\FileStorage FileStorage
-   */
-  public function get() {
-    $config_devel_settings = $this->settings->get('config_devel', array());
-    $storage_dir = $this->settings->get('file_public_path', conf_path() . '/files') . '/config_devel';
-    if (!empty($config_devel_settings['storage_dir'])) {
-      $storage_dir = $config_devel_settings['storage_dir'];
+  public static function create(Settings $settings, DrupalKernel $kernel) {
+    $configuration = $settings->get('config_devel', array());
+    if (empty($configuration['storage_dir'])) {
+      $configuration['storage_dir'] = $settings->get('file_public_path', $kernel->getSitePath() . '/files') . '/config_devel';
     }
-    return new FileStorage($storage_dir);
+    return new FileStorage($configuration['storage_dir']);
   }
 
 }

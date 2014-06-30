@@ -6,13 +6,6 @@ services:
       - { name: event_subscriber }
   config_devel.filestorage:
     class: Drupal\Core\Config\FileStorage
-    factory_service: config_devel.filestorage_factory
-    factory_method: get
-  config_devel.filestorage_factory:
-    class: Drupal\config_devel\Config\FileStorageFactory
-    arguments: ['@settings']
-  config_devel.config_factory_override:
-    class: Drupal\config_devel\Config\ConfigDevelConfigFactoryOverride
-    arguments: ['@config.storage', '@config_devel.filestorage', '@config.factory', '@settings']
-    tags:
-      - { name: config.factory.override, priority: -254 }
+    factory_class: Drupal\config_devel\Config\FileStorageFactory
+    factory_method: create
+    arguments: ['@settings', '@kernel']
