@@ -8,9 +8,7 @@
 namespace Drupal\config_devel\EventSubscriber;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Yaml\Exception\DumpException;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Drupal\Core\Site\Settings;
 use Drupal\Core\Config\FileStorage;
 use Drupal\Core\Config\InstallStorage;
@@ -18,7 +16,6 @@ use Drupal\Core\Config\Config;
 use Drupal\Core\Config\ConfigCrudEvent;
 use Drupal\Core\Config\ConfigManagerInterface;
 use Drupal\Core\Config\ConfigRenameEvent;
-use Drupal\Core\Config\ConfigImporterEvent;
 use Drupal\Core\Config\ConfigEvents;
 
 /**
@@ -73,8 +70,8 @@ class ConfigDevelFileStorageSubscriber implements EventSubscriberInterface {
    * @param \Drupal\Core\Config\ConfigManagerInterface $config_manager
    *   The configuration manager.
    */
-  public function __construct(FileStorage $filestorage, InstallStorage $default_storage, Settings $settings, ConfigManagerInterface $config_manager) {
-    $this->filestorage = $filestorage;
+  public function __construct(FileStorage $file_storage, InstallStorage $default_storage, Settings $settings, ConfigManagerInterface $config_manager) {
+    $this->filestorage = $file_storage;
     $this->defaultStorage = $default_storage;
     $this->settings = $settings;
     $this->configManager = $config_manager;
@@ -141,36 +138,15 @@ class ConfigDevelFileStorageSubscriber implements EventSubscriberInterface {
   }
 
   /**
-   * React to configuration ConfigEvent::IMPORT events.
-   *
-   * @param \Drupal\Core\Config\ConfigImporterEvent $event
-   *   The event to process.
-   */
-  public function onConfigImport(ConfigImporterEvent $event) {
-  }
-
-  /**
-   * React to Kernel::REQUEST event.
-   *
-   * @param \Symfony\Component\HttpKernel\Event\GetResponseEvent $event
-   *   The event to process.
-   */
-  public function onKernelRequest(GetResponseEvent $event) {
-    \Drupal::configFactory()->setOverrideState(TRUE);
-  }
-
-  /**
    * Registers the methods in this class that should be listeners.
    *
    * @return array
    *   An array of event listener definitions.
    */
   static function getSubscribedEvents() {
-    $events[KernelEvents::REQUEST][] = array('onKernelRequest');
     $events[ConfigEvents::SAVE][] = array('onConfigSave', 10);
     $events[ConfigEvents::DELETE][] = array('onConfigDelete', 10);
     $events[ConfigEvents::RENAME][] = array('onConfigRename', 10);
-    $events[ConfigEvents::IMPORT][] = array('onConfigImport', 10);
     return $events;
   }
 
