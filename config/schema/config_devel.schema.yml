@@ -2,7 +2,7 @@ config_devel.settings:
   type: mapping
   label: config devel settings
   mapping:
-    reinstall:
+    auto_import:
       type: sequence
       sequence:
         - type: mapping

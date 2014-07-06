@@ -15,7 +15,7 @@ use Drupal\Core\Entity\EntityManagerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
 
-class ConfigDevelReinstallSubscriber implements EventSubscriberInterface {
+class ConfigDevelAutoImportSubscriber implements EventSubscriberInterface {
 
   /**
    * @var \Drupal\Core\Config\ConfigManagerInterface
@@ -46,10 +46,10 @@ class ConfigDevelReinstallSubscriber implements EventSubscriberInterface {
   /**
    * Reinstall changed config files.
    */
-  public function reinstallConfig() {
+  public function autoImportConfig() {
     $config = $this->configFactory->get('config_devel.settings');
     $changed = FALSE;
-    foreach ($config->get('reinstall') as $key => $file) {
+    foreach ($config->get('auto_import') as $key => $file) {
       $contents = @file_get_contents($file['filename']);
       if (!$contents) {
         continue;
@@ -57,7 +57,7 @@ class ConfigDevelReinstallSubscriber implements EventSubscriberInterface {
       $hash = Crypt::hashBase64($contents);
       if ($hash != $file['hash']) {
         $changed = TRUE;
-        $config->set("reinstall.$key.hash", $hash);
+        $config->set("auto_import.$key.hash", $hash);
         $data = Yaml::decode($contents);
         $name = basename($file['filename'], '.yml');
         $entity_type_id = $this->configManager->getEntityTypeIdByName($name);
@@ -84,7 +84,7 @@ class ConfigDevelReinstallSubscriber implements EventSubscriberInterface {
    *   An array of event listener definitions.
    */
   static function getSubscribedEvents() {
-    $events[KernelEvents::REQUEST][] = array('reinstallConfig', 20);
+    $events[KernelEvents::REQUEST][] = array('autoImportConfig', 20);
     return $events;
   }
 
