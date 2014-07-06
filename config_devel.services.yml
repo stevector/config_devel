@@ -1,6 +1,6 @@
 services:
   config_devel.filestorage_subscriber:
-    class: Drupal\config_devel\EventSubscriber\ConfigDevelFileStorageSubscriber
+    class: Drupal\config_devel\EventSubscriber\ConfigDevelWriteBackSubscriber
     arguments: ['@config_devel.filestorage', '@config.storage.installer', '@settings', '@config.manager', '@config.factory']
     tags:
       - { name: event_subscriber }

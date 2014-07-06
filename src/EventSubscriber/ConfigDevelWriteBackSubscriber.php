@@ -21,7 +21,7 @@ use Drupal\Core\Config\ConfigEvents;
 /**
  * ConfigDevelFileStorageSubscriber subscriber for configuration CRUD events.
  */
-class ConfigDevelFileStorageSubscriber implements EventSubscriberInterface {
+class ConfigDevelWriteBackSubscriber implements EventSubscriberInterface {
 
   /**
    * The configuration file storage object.
