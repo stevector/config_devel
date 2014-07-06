@@ -11,3 +11,5 @@ config_devel.settings:
               type: string
             hash:
               type: string
+    write_back:
+      type: ignore

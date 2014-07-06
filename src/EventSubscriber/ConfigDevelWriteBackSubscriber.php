@@ -7,12 +7,11 @@
 
 namespace Drupal\config_devel\EventSubscriber;
 
+use Drupal\Core\Config\Config;
+use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Config\FileStorage;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Yaml\Exception\DumpException;
-use Drupal\Core\Site\Settings;
-use Drupal\Core\Config\FileStorage;
-use Drupal\Core\Config\InstallStorage;
-use Drupal\Core\Config\Config;
 use Drupal\Core\Config\ConfigCrudEvent;
 use Drupal\Core\Config\ConfigManagerInterface;
 use Drupal\Core\Config\ConfigRenameEvent;
@@ -24,25 +23,11 @@ use Drupal\Core\Config\ConfigEvents;
 class ConfigDevelWriteBackSubscriber implements EventSubscriberInterface {
 
   /**
-   * The configuration file storage object.
+   * The files to write back.
    *
-   * @var \Drupal\Core\Config\FileStorage
+   * @var array
    */
-  protected $filestorage;
-
-  /**
-   * The default extension file storage.
-   *
-   * @var \Drupal\Core\Config\InstallStorage
-   */
-  protected $defaultStorage;
-
-  /**
-   * The settings array.
-   *
-   * @var \Drupal\Core\Site\Settings
-   */
-  protected $settings;
+  protected $writeBack;
 
   /**
    * The configuration manager.
@@ -61,29 +46,15 @@ class ConfigDevelWriteBackSubscriber implements EventSubscriberInterface {
   /**
    * Constructs the ConfigDevelFileStorageSubscriber object.
    *
-   * @param \Drupal\Core\Config\StorageInterface $filestorage
-   *   The config_devel configuration storage engine.
-   * @param \Drupal\Core\Config\InstallStorage $default_storage
-   *   The default configuration storage engine.
-   * @param \Drupal\Core\Site\Settings $settings
-   *   The settings array.
+   * @param \Drupal\Core\Config\ConfigFactory $config_factory
+   *   The configuration factory.
    * @param \Drupal\Core\Config\ConfigManagerInterface $config_manager
    *   The configuration manager.
    */
-  public function __construct(FileStorage $file_storage, InstallStorage $default_storage, Settings $settings, ConfigManagerInterface $config_manager) {
-    $this->filestorage = $file_storage;
-    $this->defaultStorage = $default_storage;
-    $this->settings = $settings;
+  public function __construct(ConfigFactoryInterface $config_factory, ConfigManagerInterface $config_manager, FileStorage $file_storage) {
+    $this->fileStorage = $file_storage;
+    $this->configFactory = $config_factory;
     $this->configManager = $config_manager;
-    $this->initialize();
-  }
-
-  protected function initialize() {
-    $this->defaultConfigToWriteBack = array();
-    $config_devel_settings = $this->settings->get('config_devel', array());
-    if (!empty($config_devel_settings['write_back_to_default_config'])) {
-      $this->defaultConfigToWriteBack = $this->defaultStorage->getComponentNames('module', $config_devel_settings['write_back_to_default_config']);
-    }
   }
 
   /**
@@ -93,26 +64,7 @@ class ConfigDevelWriteBackSubscriber implements EventSubscriberInterface {
    *   The event to process.
    */
   public function onConfigSave(ConfigCrudEvent $event) {
-    $config = $event->getConfig();
-    $name = $config->getName();
-    $this->filestorage->write($name, $config->get());
-    if (isset($this->defaultConfigToWriteBack[$name])) {
-      $this->writeBackToDefaultConfig($config, $this->defaultConfigToWriteBack[$name]);
-    }
-  }
-
-  protected function writeBackToDefaultConfig(Config $config, $directory) {
-    $target = $directory . '/' . $config->getName() . '.' . FileStorage::getFileExtension();
-    if (file_exists($target) && is_writable($target)) {
-      $data = $config->get();
-      if ($this->configManager->getEntityTypeIdByName($config->getName())) {
-        unset($data['uuid']);
-      }
-      try {
-        file_put_contents($target, $this->filestorage->encode($data));
-      }
-      catch(DumpException $e) { }
-    }
+    $this->writeBackConfig($event->getConfig());
   }
 
   /**
@@ -122,19 +74,26 @@ class ConfigDevelWriteBackSubscriber implements EventSubscriberInterface {
    *   The event to process.
    */
   public function onConfigRename(ConfigRenameEvent $event) {
-    $config = $event->getConfig();
-    $this->filestorage->write($config->getName(), $config->get());
-    $this->filestorage->delete($event->getOldName());
+    $this->writeBackConfig($event->getConfig());
   }
 
-  /**
-   * React to configuration ConfigEvent::DELETE events.
-   *
-   * @param \Drupal\Core\Config\ConfigCrudEvent $event
-   *   The event to process.
-   */
-  public function onConfigDelete(ConfigCrudEvent $event) {
-    $this->filestorage->delete($event->getConfig()->getName());
+  protected function writeBackConfig(Config $config) {
+    $config_name = $config->getName();
+    $write_back = $this->configFactory->get('config_devel.settings')->get('write_back');;
+    $file_names = array_keys(array_intersect($write_back, array($config_name)));
+    if ($file_names) {
+      $data = $config->get();
+      if ($this->configManager->getEntityTypeIdByName($config_name)) {
+        unset($data['uuid']);
+      }
+      foreach ($file_names as $filename) {
+        try {
+          file_put_contents($filename, $this->fileStorage->encode($data));
+        } catch (DumpException $e) {
+          // Do nothing. What could we do?
+        }
+      }
+    }
   }
 
   /**
@@ -145,7 +104,6 @@ class ConfigDevelWriteBackSubscriber implements EventSubscriberInterface {
    */
   static function getSubscribedEvents() {
     $events[ConfigEvents::SAVE][] = array('onConfigSave', 10);
-    $events[ConfigEvents::DELETE][] = array('onConfigDelete', 10);
     $events[ConfigEvents::RENAME][] = array('onConfigRename', 10);
     return $events;
   }

@@ -1,14 +1,9 @@
 services:
-  config_devel.filestorage_subscriber:
+  config_devel.writeback_subscriber:
     class: Drupal\config_devel\EventSubscriber\ConfigDevelWriteBackSubscriber
-    arguments: ['@config_devel.filestorage', '@config.storage.installer', '@settings', '@config.manager', '@config.factory']
+    arguments: ['@config.factory', '@config.manager', '@config.storage.file']
     tags:
       - { name: event_subscriber }
-  config_devel.filestorage:
-    class: Drupal\Core\Config\FileStorage
-    factory_class: Drupal\config_devel\Config\FileStorageFactory
-    factory_method: create
-    arguments: ['@settings', '@kernel']
   config_devel.reinstall_subscriber:
     class: Drupal\config_devel\EventSubscriber\ConfigDevelReinstallSubscriber
     arguments: ['@config.manager', '@config.factory', '@entity.manager']

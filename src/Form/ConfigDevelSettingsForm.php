@@ -7,14 +7,23 @@
 
 namespace Drupal\config_devel\Form;
 
+use Drupal\Core\Config\FileStorage;
 use Drupal\Core\Form\ConfigFormBase;
 
+/**
+ * Settings form for config devel.
+ */
 class ConfigDevelSettingsForm extends ConfigFormBase {
 
   /**
    * @var \Drupal\Core\Config\Config
    */
   protected $config;
+
+  /**
+   * @var array
+   */
+  protected $keys;
 
   /**
    * {@inheritdoc}
@@ -27,8 +36,15 @@ class ConfigDevelSettingsForm extends ConfigFormBase {
     }
     $form['reinstall'] = array(
       '#type' => 'textarea',
-      '#title' => t('Reinstall these files automatically. List one file per line'),
+      '#title' => $this->t('Reinstall'),
       '#default_value' => $default_value,
+      '#description' => $this->t('Reinstall these files automatically. List one file per line'),
+    );
+    $form['write_back'] = array(
+      '#type' => 'textarea',
+      '#title' => $this->t('Write back'),
+      '#default_value' => implode("\n", array_keys($this->config->get('write_back'))),
+      '#description' => $this->t('Write back to the relevant module/theme directory.'),
     );
     return parent::buildForm($form, $form_state);
   }
@@ -37,9 +53,11 @@ class ConfigDevelSettingsForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function validateForm(array &$form, array &$form_state) {
-    $form_state['values']['reinstall'] = array_filter(preg_split("/\r\n/", $form_state['values']['reinstall']));
+    foreach (array('reinstall', 'write_back') as $key) {
+      $form_state['values'][$key] = array_filter(preg_split("/\r\n/", $form_state['values'][$key]));
+    }
     foreach ($form_state['values']['reinstall'] as $file) {
-      $name = basename($file, '.yml');
+      $name = basename($file, '.' . FileStorage::getFileExtension());
       if (in_array($name, array('system.site', 'core.extension', 'simpletest.settings'))) {
         $this->setFormError($this->t('@name is not compatible with this module', array('@name' => $name)), $form_state);
       }
@@ -58,7 +76,14 @@ class ConfigDevelSettingsForm extends ConfigFormBase {
         'hash' => '',
       );
     }
-    $this->config->set('reinstall', $reinstall)->save();
+    $write_back = array();
+    foreach ($form_state['values']['write_back'] as $file) {
+      $write_back[$file] = basename($file, '.' . FileStorage::getFileExtension());
+    }
+    $this->config
+      ->set('reinstall', $reinstall)
+      ->set('write_back', $write_back)
+      ->save();
     parent::submitForm($form, $form_state);
   }
 
