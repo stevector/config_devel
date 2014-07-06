@@ -50,7 +50,10 @@ class ConfigDevelReinstallSubscriber implements EventSubscriberInterface {
     $config = $this->configFactory->get('config_devel.settings');
     $changed = FALSE;
     foreach ($config->get('reinstall') as $key => $file) {
-      $contents = file_get_contents($file['filename']);
+      $contents = @file_get_contents($file['filename']);
+      if (!$contents) {
+        continue;
+      }
       $hash = Crypt::hashBase64($contents);
       if ($hash != $file['hash']) {
         $changed = TRUE;
