@@ -1,0 +1,13 @@
+config_devel.settings:
+  type: mapping
+  label: config devel settings
+  mapping:
+    reinstall:
+      type: sequence
+      sequence:
+        - type: mapping
+          mapping:
+            filename:
+              type: string
+            hash:
+              type: string
