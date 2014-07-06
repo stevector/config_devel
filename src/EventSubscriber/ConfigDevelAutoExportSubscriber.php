@@ -20,14 +20,14 @@ use Drupal\Core\Config\ConfigEvents;
 /**
  * ConfigDevelFileStorageSubscriber subscriber for configuration CRUD events.
  */
-class ConfigDevelWriteBackSubscriber implements EventSubscriberInterface {
+class ConfigDevelAutoExportSubscriber implements EventSubscriberInterface {
 
   /**
-   * The files to write back.
+   * The files to automatically export.
    *
    * @var array
    */
-  protected $writeBack;
+  protected $autoExportFiles;
 
   /**
    * The configuration manager.
@@ -37,14 +37,7 @@ class ConfigDevelWriteBackSubscriber implements EventSubscriberInterface {
   protected $configManager;
 
   /**
-   * List of config objects to write back to extension default config.
-   *
-   * @var array
-   */
-  protected $defaultConfigToWriteBack;
-
-  /**
-   * Constructs the ConfigDevelFileStorageSubscriber object.
+   * Constructs the ConfigDevelAutoExportSubscriber object.
    *
    * @param \Drupal\Core\Config\ConfigFactory $config_factory
    *   The configuration factory.
@@ -64,7 +57,7 @@ class ConfigDevelWriteBackSubscriber implements EventSubscriberInterface {
    *   The event to process.
    */
   public function onConfigSave(ConfigCrudEvent $event) {
-    $this->writeBackConfig($event->getConfig());
+    $this->autoExportConfig($event->getConfig());
   }
 
   /**
@@ -74,13 +67,13 @@ class ConfigDevelWriteBackSubscriber implements EventSubscriberInterface {
    *   The event to process.
    */
   public function onConfigRename(ConfigRenameEvent $event) {
-    $this->writeBackConfig($event->getConfig());
+    $this->autoExportConfig($event->getConfig());
   }
 
-  protected function writeBackConfig(Config $config) {
+  protected function autoExportConfig(Config $config) {
     $config_name = $config->getName();
-    $write_back = $this->configFactory->get('config_devel.settings')->get('write_back');;
-    $file_names = array_keys(array_intersect($write_back, array($config_name)));
+    $auto_export = $this->configFactory->get('config_devel.settings')->get('auto_export');
+    $file_names = array_keys(array_intersect($auto_export, array($config_name)));
     if ($file_names) {
       $data = $config->get();
       if ($this->configManager->getEntityTypeIdByName($config_name)) {

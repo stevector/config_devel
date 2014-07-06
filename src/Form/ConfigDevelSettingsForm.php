@@ -38,13 +38,13 @@ class ConfigDevelSettingsForm extends ConfigFormBase {
       '#type' => 'textarea',
       '#title' => $this->t('Reinstall'),
       '#default_value' => $default_value,
-      '#description' => $this->t('Reinstall these files automatically. List one file per line'),
+      '#description' => $this->t('Reinstall these files automatically. List one file per line.'),
     );
-    $form['write_back'] = array(
+    $form['auto_export'] = array(
       '#type' => 'textarea',
-      '#title' => $this->t('Write back'),
-      '#default_value' => implode("\n", array_keys($this->config->get('write_back'))),
-      '#description' => $this->t('Write back to the relevant module/theme directory.'),
+      '#title' => $this->t('Auto export'),
+      '#default_value' => implode("\n", array_keys($this->config->get('auto_export'))),
+      '#description' => $this->t('Automatically export to the files specified. List one file per line.'),
     );
     return parent::buildForm($form, $form_state);
   }
@@ -53,7 +53,7 @@ class ConfigDevelSettingsForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function validateForm(array &$form, array &$form_state) {
-    foreach (array('reinstall', 'write_back') as $key) {
+    foreach (array('reinstall', 'auto_export') as $key) {
       $form_state['values'][$key] = array_filter(preg_split("/\r\n/", $form_state['values'][$key]));
     }
     foreach ($form_state['values']['reinstall'] as $file) {
@@ -76,13 +76,13 @@ class ConfigDevelSettingsForm extends ConfigFormBase {
         'hash' => '',
       );
     }
-    $write_back = array();
-    foreach ($form_state['values']['write_back'] as $file) {
-      $write_back[$file] = basename($file, '.' . FileStorage::getFileExtension());
+    $auto_export = array();
+    foreach ($form_state['values']['auto_export'] as $file) {
+      $auto_export[$file] = basename($file, '.' . FileStorage::getFileExtension());
     }
     $this->config
       ->set('reinstall', $reinstall)
-      ->set('write_back', $write_back)
+      ->set('auto_export', $auto_export)
       ->save();
     parent::submitForm($form, $form_state);
   }

@@ -1,6 +1,6 @@
 services:
   config_devel.writeback_subscriber:
-    class: Drupal\config_devel\EventSubscriber\ConfigDevelWriteBackSubscriber
+    class: Drupal\config_devel\EventSubscriber\ConfigDevelAutoExportSubscriber
     arguments: ['@config.factory', '@config.manager', '@config.storage.file']
     tags:
       - { name: event_subscriber }
