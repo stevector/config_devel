@@ -28,19 +28,13 @@ class ConfigDevelAutoImportSubscriber implements EventSubscriberInterface {
   protected $configFactory;
 
   /**
-   * @var \Drupal\Core\Entity\EntityManagerInterface
-   */
-  protected $entityManager;
-
-  /**
    * @param ConfigManagerInterface $config_manager
    * @param ConfigFactoryInterface $config_factory
    * @param EntityManagerInterface $entity_manager
    */
-  public function __construct(ConfigManagerInterface $config_manager, ConfigFactoryInterface $config_factory, EntityManagerInterface $entity_manager) {
+  public function __construct(ConfigManagerInterface $config_manager, ConfigFactoryInterface $config_factory) {
     $this->configManager = $config_manager;
     $this->configFactory = $config_factory;
-    $this->entityManager = $entity_manager;
   }
 
   /**
@@ -62,10 +56,22 @@ class ConfigDevelAutoImportSubscriber implements EventSubscriberInterface {
         $name = basename($file['filename'], '.yml');
         $entity_type_id = $this->configManager->getEntityTypeIdByName($name);
         if ($entity_type_id) {
-          $this->entityManager
-            ->getStorage($entity_type_id)
-            ->create($data)
-            ->save();
+          $entity_manager = $this->configManager->getEntityManager();
+          /** @var $storage \Drupal\Core\Config\Entity\ConfigEntityStorageInterface */
+          $storage = $entity_manager->getStorage($entity_type_id);
+          $entity_id = $storage::getIDFromConfigName($name, $storage->getConfigPrefix());
+          if ($existing_entity = $storage->load($entity_id)) {
+            $entity_type = $entity_manager->getDefinition($entity_type_id);
+            $id_key = $entity_type->getKey('id');
+            $uuid_key = $entity_type->getKey('uuid');
+            $data[$id_key] = $existing_entity->id();
+            $data[$uuid_key] = $existing_entity->uuid();
+            $entity = $storage->create($data)->enforceIsNew(FALSE);
+          }
+          else {
+            $entity = $storage->create($data);
+          }
+          $storage->save($entity);
         }
         else {
           $this->configFactory->get($name)->setData($data)->save();

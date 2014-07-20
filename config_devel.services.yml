@@ -6,6 +6,6 @@ services:
       - { name: event_subscriber }
   config_devel.auto_import_subscriber:
     class: Drupal\config_devel\EventSubscriber\ConfigDevelAutoImportSubscriber
-    arguments: ['@config.manager', '@config.factory', '@entity.manager']
+    arguments: ['@config.manager', '@config.factory']
     tags:
       - { name: event_subscriber }
