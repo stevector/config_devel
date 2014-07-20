@@ -59,12 +59,14 @@ class ConfigDevelAutoImportSubscriber implements EventSubscriberInterface {
           $entity_manager = $this->configManager->getEntityManager();
           /** @var $storage \Drupal\Core\Config\Entity\ConfigEntityStorageInterface */
           $storage = $entity_manager->getStorage($entity_type_id);
-          $entity_id = $storage::getIDFromConfigName($name, $storage->getConfigPrefix());
+          // getIDFromConfigName adds a dot but getConfigPrefix has a dot
+          // already.
+          $entity_id = $storage::getIDFromConfigName($name, substr($storage->getConfigPrefix(), 0, -1));
+          $entity_type = $entity_manager->getDefinition($entity_type_id);
+          $id_key = $entity_type->getKey('id');
+          $data[$id_key] = $entity_id;
           if ($existing_entity = $storage->load($entity_id)) {
-            $entity_type = $entity_manager->getDefinition($entity_type_id);
-            $id_key = $entity_type->getKey('id');
             $uuid_key = $entity_type->getKey('uuid');
-            $data[$id_key] = $existing_entity->id();
             $data[$uuid_key] = $existing_entity->uuid();
             $entity = $storage->create($data)->enforceIsNew(FALSE);
           }
