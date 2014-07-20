@@ -57,23 +57,23 @@ class ConfigDevelAutoImportSubscriber implements EventSubscriberInterface {
         $entity_type_id = $this->configManager->getEntityTypeIdByName($name);
         if ($entity_type_id) {
           $entity_manager = $this->configManager->getEntityManager();
-          /** @var $storage \Drupal\Core\Config\Entity\ConfigEntityStorageInterface */
-          $storage = $entity_manager->getStorage($entity_type_id);
+          /** @var $entity_storage \Drupal\Core\Config\Entity\ConfigEntityStorageInterface */
+          $entity_storage = $entity_manager->getStorage($entity_type_id);
           // getIDFromConfigName adds a dot but getConfigPrefix has a dot
           // already.
-          $entity_id = $storage::getIDFromConfigName($name, substr($storage->getConfigPrefix(), 0, -1));
+          $entity_id = $entity_storage::getIDFromConfigName($name, substr($entity_storage->getConfigPrefix(), 0, -1));
           $entity_type = $entity_manager->getDefinition($entity_type_id);
           $id_key = $entity_type->getKey('id');
           $data[$id_key] = $entity_id;
-          if ($existing_entity = $storage->load($entity_id)) {
+          if ($existing_entity = $entity_storage->load($entity_id)) {
             $uuid_key = $entity_type->getKey('uuid');
             $data[$uuid_key] = $existing_entity->uuid();
-            $entity = $storage->create($data)->enforceIsNew(FALSE);
+            $entity = $entity_storage->create($data)->enforceIsNew(FALSE);
           }
           else {
-            $entity = $storage->create($data);
+            $entity = $entity_storage->create($data);
           }
-          $storage->save($entity);
+          $entity_storage->save($entity);
         }
         else {
           $this->configFactory->get($name)->setData($data)->save();
