@@ -45,9 +45,9 @@ abstract class ConfigDevelSubscriberTestBase extends KernelTestBase {
         $exported_filename => static::CONFIGNAME,
       ))
       ->save();
-    $this->storage = $this->container->get('config.storage');
+    $this->storage = \Drupal::service('config.storage');
     $this->assertFalse($this->storage->exists(static::CONFIGNAME));
-    $subscriber = $this->container->get('config_devel.auto_import_subscriber');
+    $subscriber = \Drupal::service('config_devel.auto_import_subscriber');
     for ($i = 2; $i; $i--) {
       $data['label'] = $this->randomString();
       file_put_contents($filename, Yaml::encode($data));
