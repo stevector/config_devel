@@ -7,35 +7,11 @@
 
 namespace Drupal\config_devel\EventSubscriber;
 
-use Drupal\Component\Serialization\Yaml;
 use Drupal\Component\Utility\Crypt;
-use Drupal\Core\Config\ConfigFactoryInterface;
-use Drupal\Core\Config\ConfigManagerInterface;
-use Drupal\Core\Entity\EntityManagerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
 
-class ConfigDevelAutoImportSubscriber implements EventSubscriberInterface {
-
-  /**
-   * @var \Drupal\Core\Config\ConfigManagerInterface
-   */
-  protected $configManager;
-
-  /**
-   * @var \Drupal\Core\Config\ConfigFactoryInterface
-   */
-  protected $configFactory;
-
-  /**
-   * @param ConfigManagerInterface $config_manager
-   * @param ConfigFactoryInterface $config_factory
-   * @param EntityManagerInterface $entity_manager
-   */
-  public function __construct(ConfigManagerInterface $config_manager, ConfigFactoryInterface $config_factory) {
-    $this->configManager = $config_manager;
-    $this->configFactory = $config_factory;
-  }
+class ConfigDevelAutoImportSubscriber extends ConfigDevelSubscriberBase implements EventSubscriberInterface {
 
   /**
    * Reinstall changed config files.
@@ -52,15 +28,15 @@ class ConfigDevelAutoImportSubscriber implements EventSubscriberInterface {
       if ($hash != $file['hash']) {
         $changed = TRUE;
         $config->set("auto_import.$key.hash", $hash);
-        $data = Yaml::decode($contents);
-        $name = basename($file['filename'], '.yml');
-        $entity_type_id = $this->configManager->getEntityTypeIdByName($name);
+        $data = $this->fileStorage->decode($contents);
+        $config_name = basename($file['filename'], '.yml');
+        $entity_type_id = $this->configManager->getEntityTypeIdByName($config_name);
         if ($entity_type_id) {
           /** @var $entity_storage \Drupal\Core\Config\Entity\ConfigEntityStorageInterface */
-          $entity_storage = $this->configManager->getEntityManager()->getStorage($entity_type_id);
+          $entity_storage = $this->getStorage($entity_type_id);
           // getIDFromConfigName adds a dot but getConfigPrefix has a dot
           // already.
-          $entity_id = $entity_storage::getIDFromConfigName($name, substr($entity_storage->getConfigPrefix(), 0, -1));
+          $entity_id = $this->getEntityId($entity_storage, $config_name);
           $entity_type = $entity_storage->getEntityType();
           $id_key = $entity_type->getKey('id');
           $data[$id_key] = $entity_id;
@@ -73,7 +49,7 @@ class ConfigDevelAutoImportSubscriber implements EventSubscriberInterface {
           $entity_storage->save($entity);
         }
         else {
-          $this->configFactory->get($name)->setData($data)->save();
+          $this->configFactory->get($config_name)->setData($data)->save();
         }
       }
     }

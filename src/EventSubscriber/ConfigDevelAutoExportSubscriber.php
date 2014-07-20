@@ -8,19 +8,16 @@
 namespace Drupal\config_devel\EventSubscriber;
 
 use Drupal\Core\Config\Config;
-use Drupal\Core\Config\ConfigFactoryInterface;
-use Drupal\Core\Config\FileStorage;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Yaml\Exception\DumpException;
 use Drupal\Core\Config\ConfigCrudEvent;
-use Drupal\Core\Config\ConfigManagerInterface;
 use Drupal\Core\Config\ConfigRenameEvent;
 use Drupal\Core\Config\ConfigEvents;
 
 /**
  * ConfigDevelFileStorageSubscriber subscriber for configuration CRUD events.
  */
-class ConfigDevelAutoExportSubscriber implements EventSubscriberInterface {
+class ConfigDevelAutoExportSubscriber extends ConfigDevelSubscriberBase implements EventSubscriberInterface {
 
   /**
    * The files to automatically export.
@@ -28,27 +25,6 @@ class ConfigDevelAutoExportSubscriber implements EventSubscriberInterface {
    * @var array
    */
   protected $autoExportFiles;
-
-  /**
-   * The configuration manager.
-   *
-   * @var \Drupal\Core\Config\ConfigManagerInterface
-   */
-  protected $configManager;
-
-  /**
-   * Constructs the ConfigDevelAutoExportSubscriber object.
-   *
-   * @param \Drupal\Core\Config\ConfigFactory $config_factory
-   *   The configuration factory.
-   * @param \Drupal\Core\Config\ConfigManagerInterface $config_manager
-   *   The configuration manager.
-   */
-  public function __construct(ConfigFactoryInterface $config_factory, ConfigManagerInterface $config_manager, FileStorage $file_storage) {
-    $this->fileStorage = $file_storage;
-    $this->configFactory = $config_factory;
-    $this->configManager = $config_manager;
-  }
 
   /**
    * React to configuration ConfigEvent::SAVE events.
@@ -77,23 +53,29 @@ class ConfigDevelAutoExportSubscriber implements EventSubscriberInterface {
     if ($file_names) {
       $data = $config->get();
       if ($entity_type_id = $this->configManager->getEntityTypeIdByName($config_name)) {
-        /** @var $entity_storage \Drupal\Core\Config\Entity\ConfigEntityStorageInterface */
-        $entity_storage = $this->configManager->getEntityManager()->getStorage($entity_type_id);
-        $entity_id = $entity_storage::getIDFromConfigName($config_name, substr($entity_storage->getConfigPrefix(), 0, -1));
-        $id_key = $entity_storage->getEntityType()->getKey('id');
-        $empty_entity = $entity_storage->create(array($id_key => $entity_id));
-        $empty_data = $empty_entity->toArray();
-        foreach ($empty_data as $k => $v) {
-          if ($k !== $id_key && $data[$k] === $v) {
-            unset($data[$k]);
+        try {
+          $entity_storage = $this->getStorage($entity_type_id);
+          $entity_id = $this->getEntityId($entity_storage, $config_name);
+          $id_key = $entity_storage->getEntityType()->getKey('id');
+          // \Drupal\Core\Config\Entity\ConfigEntityBase::toArray() uses id().
+          $empty_entity = $entity_storage->create(array($id_key => $entity_id));
+          $empty_data = $empty_entity->toArray();
+          foreach ($empty_data as $k => $v) {
+            if ($k !== $id_key && $data[$k] === $v) {
+              unset($data[$k]);
+            }
           }
+        }
+        catch (\Exception $e) {
+          // Cleanup is non-essential so any problems we can skip.
         }
         unset($data['uuid']);
       }
       foreach ($file_names as $filename) {
         try {
           file_put_contents($filename, $this->fileStorage->encode($data));
-        } catch (DumpException $e) {
+        }
+        catch (DumpException $e) {
           // Do nothing. What could we do?
         }
       }
