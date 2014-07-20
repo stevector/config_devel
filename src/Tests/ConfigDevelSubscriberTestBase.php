@@ -30,7 +30,7 @@ abstract class ConfigDevelSubscriberTestBase extends KernelTestBase {
   /**
    * Test the import subscriber.
    */
-  public function testAutoImportSubscriber() {
+  public function testSubscribers() {
     // Without this the config exporter breaks.
     \Drupal::service('config.installer')->installDefaultConfig('module', 'config_devel');
     /** @var $storage \Drupal\Core\Config\StorageInterface */
@@ -51,6 +51,7 @@ abstract class ConfigDevelSubscriberTestBase extends KernelTestBase {
     for ($i = 2; $i; $i--) {
       $data['label'] = $this->randomString();
       file_put_contents($filename, Yaml::encode($data));
+      // The import fires an export too.
       $subscriber->autoImportConfig();
       $this->doAssert($data, Yaml::decode(file_get_contents($exported_filename)));
     }
