@@ -33,6 +33,6 @@ class ConfigDevelSubscriberEntityTest extends ConfigDevelSubscriberTestBase {
     $this->assertIdentical($data['label'], $entity->get('label'));
     $this->assertIdentical($exported_data['label'], $data['label']);
     $this->assertIdentical($exported_data['id'], 'test');
-    $this->assertIdentical(count($exported_data), 2);
+    $this->assertFalse(isset($exported_data['uuid']));
   }
 }

@@ -69,7 +69,11 @@ class ConfigDevelAutoExportSubscriber extends ConfigDevelSubscriberBase implemen
    */
   public function writeBackConfig(Config $config, array $file_names) {
     if ($file_names) {
-      $data = $this->cleanupData($config);
+      $data = $config->get();
+      $config_name = $config->getName();
+      if ($entity_type_id = $this->configManager->getEntityTypeIdByName($config_name)) {
+        unset($data['uuid']);
+      }
       foreach ($file_names as $file_name) {
         try {
           file_put_contents($file_name, $this->fileStorage->encode($data));
@@ -79,39 +83,6 @@ class ConfigDevelAutoExportSubscriber extends ConfigDevelSubscriberBase implemen
         }
       }
     }
-  }
-
-  /**
-   * @param \Drupal\Core\Config\Config $config
-   *   The configuration object.
-   *
-   * @return array
-   *   If this is a configuration entity, default values will be removed from
-   *   data.
-   */
-  protected function cleanupData(Config $config) {
-    $data = $config->get();
-    $config_name = $config->getName();
-    if ($entity_type_id = $this->configManager->getEntityTypeIdByName($config_name)) {
-      try {
-        $entity_storage = $this->getStorage($entity_type_id);
-        $entity_id = $this->getEntityId($entity_storage, $config_name);
-        $id_key = $entity_storage->getEntityType()->getKey('id');
-        // \Drupal\Core\Config\Entity\ConfigEntityBase::toArray() uses id().
-        $empty_entity = $entity_storage->create(array($id_key => $entity_id));
-        $empty_data = $empty_entity->toArray();
-        foreach ($empty_data as $k => $v) {
-          if ($k !== $id_key && $data[$k] === $v) {
-            unset($data[$k]);
-          }
-        }
-      }
-      catch (\Exception $e) {
-        // Cleanup is non-essential so any problems we can skip.
-      }
-      unset($data['uuid']);
-    }
-    return $data;
   }
 
   /**

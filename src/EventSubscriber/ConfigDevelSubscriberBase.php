@@ -76,4 +76,5 @@ class ConfigDevelSubscriberBase {
   protected function getSettings() {
     return $this->configFactory->get('config_devel.settings');
   }
+
 }
