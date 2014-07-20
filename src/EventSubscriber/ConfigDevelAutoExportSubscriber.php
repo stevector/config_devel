@@ -46,12 +46,30 @@ class ConfigDevelAutoExportSubscriber extends ConfigDevelSubscriberBase implemen
     $this->autoExportConfig($event->getConfig());
   }
 
+  /**
+   * Automatically export configuration.
+   *
+   * @param Config $config
+   *   The config object.
+   */
   protected function autoExportConfig(Config $config) {
     $config_name = $config->getName();
     $auto_export = $this->configFactory->get('config_devel.settings')->get('auto_export');
     $file_names = array_keys(array_intersect($auto_export, array($config_name)));
+    $this->writeBackConfig($config, $file_names);
+  }
+
+  /**
+   * write configuration back to files.
+   *
+   * @param \Drupal\Core\Config\Config $config
+   *   The config object.
+   * @param array $file_names
+   *   The file names to which the configuration should be written.
+   */
+  public function writeBackConfig(Config $config, array $file_names) {
     if ($file_names) {
-      $data = $this->cleanupData($config->get(), $config_name);;
+      $data = $this->cleanupData($config);
       foreach ($file_names as $filename) {
         try {
           file_put_contents($filename, $this->fileStorage->encode($data));
@@ -64,16 +82,16 @@ class ConfigDevelAutoExportSubscriber extends ConfigDevelSubscriberBase implemen
   }
 
   /**
-   * @param array $data
-   *   The configuration data array.
-   * @param $config_name
-   *   The name of the configuration
+   * @param \Drupal\Core\Config\Config $config
+   *   The configuration object.
    *
    * @return array
    *   If this is a configuration entity, default values will be removed from
    *   data.
    */
-  protected function cleanupData(array $data, $config_name) {
+  protected function cleanupData(Config $config) {
+    $data = $config->get();
+    $config_name = $config->getName();
     if ($entity_type_id = $this->configManager->getEntityTypeIdByName($config_name)) {
       try {
         $entity_storage = $this->getStorage($entity_type_id);
