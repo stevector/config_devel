@@ -32,10 +32,7 @@ class ConfigDevelAutoImportSubscriber extends ConfigDevelSubscriberBase implemen
         $config_name = basename($file['filename'], '.yml');
         $entity_type_id = $this->configManager->getEntityTypeIdByName($config_name);
         if ($entity_type_id) {
-          /** @var $entity_storage \Drupal\Core\Config\Entity\ConfigEntityStorageInterface */
           $entity_storage = $this->getStorage($entity_type_id);
-          // getIDFromConfigName adds a dot but getConfigPrefix has a dot
-          // already.
           $entity_id = $this->getEntityId($entity_storage, $config_name);
           $entity_type = $entity_storage->getEntityType();
           $id_key = $entity_type->getKey('id');

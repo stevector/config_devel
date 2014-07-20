@@ -66,6 +66,7 @@ class ConfigDevelSubscriberBase {
    * @return string
    */
   protected function getEntityId(ConfigEntityStorageInterface $entity_storage, $config_name) {
+    // getIDFromConfigName adds a dot but getConfigPrefix has a dot already.
     return $entity_storage::getIDFromConfigName($config_name, substr($entity_storage->getConfigPrefix(), 0, -1));
   }
 
