@@ -10,7 +10,7 @@ namespace Drupal\config_devel\Tests;
 use Drupal\Component\Serialization\Yaml;
 use Drupal\simpletest\KernelTestBase;
 
-abstract class ConfigDevelAutoImportSubscriberTestBase extends KernelTestBase {
+abstract class ConfigDevelSubscriberTestBase extends KernelTestBase {
 
   /**
    * {@inheritdoc}

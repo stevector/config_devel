@@ -2,18 +2,17 @@
 
 /**
  * @file
- * Contains \Drupal\config_devel\Tests\ConfigDevelAutoImportSubscriberTest.
+ * Contains \Drupal\config_devel\Tests\ConfigDevelSubscriberRawTest.
  */
 
 namespace Drupal\config_devel\Tests;
-use Drupal\Component\Serialization\Yaml;
 
 /**
  * Tests the automated importer for raw config objects.
  *
  * @group config
  */
-class ConfigDevelAutoImportSubscriberRawTest extends ConfigDevelAutoImportSubscriberTestBase {
+class ConfigDevelSubscriberRawTest extends ConfigDevelSubscriberTestBase {
 
   /**
    * {@inheritdoc}

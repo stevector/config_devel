@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\config_devel\Tests\ConfigDevelAutoImportSubscriberEntityTest.
+ * Contains \Drupal\config_devel\Tests\ConfigDevelSubscriberEntityTest.
  */
 
 
@@ -13,7 +13,7 @@ namespace Drupal\config_devel\Tests;
  *
  * @group config
  */
-class ConfigDevelAutoImportSubscriberEntityTest extends ConfigDevelAutoImportSubscriberTestBase {
+class ConfigDevelSubscriberEntityTest extends ConfigDevelSubscriberTestBase {
 
   /**
    * {@inheritdoc}
