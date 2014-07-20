@@ -51,26 +51,7 @@ class ConfigDevelAutoExportSubscriber extends ConfigDevelSubscriberBase implemen
     $auto_export = $this->configFactory->get('config_devel.settings')->get('auto_export');
     $file_names = array_keys(array_intersect($auto_export, array($config_name)));
     if ($file_names) {
-      $data = $config->get();
-      if ($entity_type_id = $this->configManager->getEntityTypeIdByName($config_name)) {
-        try {
-          $entity_storage = $this->getStorage($entity_type_id);
-          $entity_id = $this->getEntityId($entity_storage, $config_name);
-          $id_key = $entity_storage->getEntityType()->getKey('id');
-          // \Drupal\Core\Config\Entity\ConfigEntityBase::toArray() uses id().
-          $empty_entity = $entity_storage->create(array($id_key => $entity_id));
-          $empty_data = $empty_entity->toArray();
-          foreach ($empty_data as $k => $v) {
-            if ($k !== $id_key && $data[$k] === $v) {
-              unset($data[$k]);
-            }
-          }
-        }
-        catch (\Exception $e) {
-          // Cleanup is non-essential so any problems we can skip.
-        }
-        unset($data['uuid']);
-      }
+      $data = $this->cleanupData($config->get(), $config_name);;
       foreach ($file_names as $filename) {
         try {
           file_put_contents($filename, $this->fileStorage->encode($data));
@@ -80,6 +61,39 @@ class ConfigDevelAutoExportSubscriber extends ConfigDevelSubscriberBase implemen
         }
       }
     }
+  }
+
+  /**
+   * @param array $data
+   *   The configuration data array.
+   * @param $config_name
+   *   The name of the configuration
+   *
+   * @return array
+   *   If this is a configuration entity, default values will be removed from
+   *   data.
+   */
+  protected function cleanupData(array $data, $config_name) {
+    if ($entity_type_id = $this->configManager->getEntityTypeIdByName($config_name)) {
+      try {
+        $entity_storage = $this->getStorage($entity_type_id);
+        $entity_id = $this->getEntityId($entity_storage, $config_name);
+        $id_key = $entity_storage->getEntityType()->getKey('id');
+        // \Drupal\Core\Config\Entity\ConfigEntityBase::toArray() uses id().
+        $empty_entity = $entity_storage->create(array($id_key => $entity_id));
+        $empty_data = $empty_entity->toArray();
+        foreach ($empty_data as $k => $v) {
+          if ($k !== $id_key && $data[$k] === $v) {
+            unset($data[$k]);
+          }
+        }
+      }
+      catch (\Exception $e) {
+        // Cleanup is non-essential so any problems we can skip.
+      }
+      unset($data['uuid']);
+    }
+    return $data;
   }
 
   /**
