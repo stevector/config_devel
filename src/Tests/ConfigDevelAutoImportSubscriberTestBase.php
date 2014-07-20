@@ -31,6 +31,7 @@ abstract class ConfigDevelAutoImportSubscriberTestBase extends KernelTestBase {
    * Test the import subscriber.
    */
   public function testAutoImportSubscriber() {
+    // Without this the config exporter breaks.
     \Drupal::service('config.installer')->installDefaultConfig('module', 'config_devel');
     /** @var $storage \Drupal\Core\Config\StorageInterface */
     $filename = 'public://'. static::CONFIGNAME . '.yml';
