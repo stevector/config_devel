@@ -70,9 +70,9 @@ class ConfigDevelAutoExportSubscriber extends ConfigDevelSubscriberBase implemen
   public function writeBackConfig(Config $config, array $file_names) {
     if ($file_names) {
       $data = $this->cleanupData($config);
-      foreach ($file_names as $filename) {
+      foreach ($file_names as $file_name) {
         try {
-          file_put_contents($filename, $this->fileStorage->encode($data));
+          file_put_contents($file_name, $this->fileStorage->encode($data));
         }
         catch (DumpException $e) {
           // Do nothing. What could we do?
