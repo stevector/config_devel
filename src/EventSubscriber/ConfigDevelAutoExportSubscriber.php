@@ -76,7 +76,18 @@ class ConfigDevelAutoExportSubscriber implements EventSubscriberInterface {
     $file_names = array_keys(array_intersect($auto_export, array($config_name)));
     if ($file_names) {
       $data = $config->get();
-      if ($this->configManager->getEntityTypeIdByName($config_name)) {
+      if ($entity_type_id = $this->configManager->getEntityTypeIdByName($config_name)) {
+        /** @var $entity_storage \Drupal\Core\Config\Entity\ConfigEntityStorageInterface */
+        $entity_storage = $this->configManager->getEntityManager()->getStorage($entity_type_id);
+        $entity_id = $entity_storage::getIDFromConfigName($config_name, substr($entity_storage->getConfigPrefix(), 0, -1));
+        $id_key = $entity_storage->getEntityType()->getKey('id');
+        $empty_entity = $entity_storage->create(array($id_key => $entity_id));
+        $empty_data = $empty_entity->toArray();
+        foreach ($empty_data as $k => $v) {
+          if ($k !== $id_key && $data[$k] === $v) {
+            unset($data[$k]);
+          }
+        }
         unset($data['uuid']);
       }
       foreach ($file_names as $filename) {

@@ -6,6 +6,7 @@
  */
 
 namespace Drupal\config_devel\Tests;
+use Drupal\Component\Serialization\Yaml;
 
 /**
  * Tests the automated importer for raw config objects.
@@ -22,8 +23,9 @@ class ConfigDevelAutoImportSubscriberRawTest extends ConfigDevelAutoImportSubscr
   /**
    * {@inheritdoc}
    */
-  public function doAssert(array $data) {
+  protected function doAssert(array $data, array $exported_data) {
     $this->assertIdentical($data, $this->storage->read(static::CONFIGNAME));
+    $this->assertIdentical($data, $exported_data);
   }
 
 
