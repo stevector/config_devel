@@ -12,9 +12,15 @@ use Drupal\simpletest\KernelTestBase;
 
 abstract class ConfigDevelAutoImportSubscriberTestBase extends KernelTestBase {
 
-  const CONFIGNAME = '';
-
+  /**
+   * {@inheritdoc}
+   */
   public static $modules = array('config_devel');
+
+  /**
+   * Name of the config object.
+   */
+  const CONFIGNAME = '';
 
   /**
    * @var \Drupal\Core\Config\StorageInterface
@@ -45,6 +51,12 @@ abstract class ConfigDevelAutoImportSubscriberTestBase extends KernelTestBase {
     }
   }
 
+  /**
+   * Assert that the config import succeeded.
+   *
+   * @param array $data
+   *   The config data read from the active storage.
+   */
   abstract protected function doAssert(array $data);
 
 }

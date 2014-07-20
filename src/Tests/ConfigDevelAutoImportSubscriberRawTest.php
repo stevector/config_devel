@@ -14,10 +14,13 @@ namespace Drupal\config_devel\Tests;
  */
 class ConfigDevelAutoImportSubscriberRawTest extends ConfigDevelAutoImportSubscriberTestBase {
 
+  /**
+   * {@inheritdoc}
+   */
   const CONFIGNAME = 'config_devel.test';
 
   /**
-   * Tests a non-entity import
+   * {@inheritdoc}
    */
   public function doAssert(array $data) {
     $this->assertIdentical($data, $this->storage->read(static::CONFIGNAME));
