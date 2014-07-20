@@ -56,13 +56,12 @@ class ConfigDevelAutoImportSubscriber implements EventSubscriberInterface {
         $name = basename($file['filename'], '.yml');
         $entity_type_id = $this->configManager->getEntityTypeIdByName($name);
         if ($entity_type_id) {
-          $entity_manager = $this->configManager->getEntityManager();
           /** @var $entity_storage \Drupal\Core\Config\Entity\ConfigEntityStorageInterface */
-          $entity_storage = $entity_manager->getStorage($entity_type_id);
+          $entity_storage = $this->configManager->getEntityManager()->getStorage($entity_type_id);
           // getIDFromConfigName adds a dot but getConfigPrefix has a dot
           // already.
           $entity_id = $entity_storage::getIDFromConfigName($name, substr($entity_storage->getConfigPrefix(), 0, -1));
-          $entity_type = $entity_manager->getDefinition($entity_type_id);
+          $entity_type = $entity_storage->getEntityType();
           $id_key = $entity_type->getKey('id');
           $data[$id_key] = $entity_id;
           $entity = $entity_storage->create($data);
