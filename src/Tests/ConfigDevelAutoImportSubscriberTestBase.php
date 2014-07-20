@@ -56,7 +56,7 @@ abstract class ConfigDevelAutoImportSubscriberTestBase extends KernelTestBase {
    * Assert that the config import succeeded.
    *
    * @param array $data
-   *   The config data read from the active storage.
+   *   The config data as written.
    */
   abstract protected function doAssert(array $data);
 
