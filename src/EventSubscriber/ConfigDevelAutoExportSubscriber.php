@@ -54,7 +54,7 @@ class ConfigDevelAutoExportSubscriber extends ConfigDevelSubscriberBase implemen
    */
   protected function autoExportConfig(Config $config) {
     $config_name = $config->getName();
-    $auto_export = $this->configFactory->get('config_devel.settings')->get('auto_export');
+    $auto_export = $this->getSettings()->get('auto_export');
     $file_names = array_keys(array_intersect($auto_export, array($config_name)));
     $this->writeBackConfig($config, $file_names);
   }

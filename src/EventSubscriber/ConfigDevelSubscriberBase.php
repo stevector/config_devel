@@ -70,4 +70,10 @@ class ConfigDevelSubscriberBase {
     return $entity_storage::getIDFromConfigName($config_name, substr($entity_storage->getConfigPrefix(), 0, -1));
   }
 
+  /**
+   * @return \Drupal\Core\Config\Config
+   */
+  protected function getSettings() {
+    return $this->configFactory->get('config_devel.settings');
+  }
 }

@@ -17,7 +17,7 @@ class ConfigDevelAutoImportSubscriber extends ConfigDevelSubscriberBase implemen
    * Reinstall changed config files.
    */
   public function autoImportConfig() {
-    $config = $this->configFactory->get('config_devel.settings');
+    $config = $this->getSettings();
     $changed = FALSE;
     foreach ($config->get('auto_import') as $key => $file) {
       $contents = @file_get_contents($file['filename']);
