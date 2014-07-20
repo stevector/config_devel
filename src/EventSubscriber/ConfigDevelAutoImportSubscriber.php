@@ -67,7 +67,7 @@ class ConfigDevelAutoImportSubscriber implements EventSubscriberInterface {
           $entity = $entity_storage->create($data);
           if ($existing_entity = $entity_storage->load($entity_id)) {
             $entity
-              ->set($entity_type->getKey('uuid'), $existing_entity->uuid())
+              ->set('uuid', $existing_entity->uuid())
               ->enforceIsNew(FALSE);
           }
           $entity_storage->save($entity);
