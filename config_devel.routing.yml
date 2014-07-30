@@ -1,5 +1,5 @@
 config_devel.settings:
-  path: '/admin/config/config_devel'
+  path: '/admin/config/development/config_devel'
   defaults:
     _form: 'Drupal\config_devel\Form\ConfigDevelSettingsForm'
     _title: 'Config Devel'
