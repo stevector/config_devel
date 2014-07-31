@@ -35,14 +35,15 @@ abstract class ConfigDevelSubscriberTestBase extends KernelTestBase {
     \Drupal::service('config.installer')->installDefaultConfig('module', 'config_devel');
     /** @var $storage \Drupal\Core\Config\StorageInterface */
     $filename = 'public://'. static::CONFIGNAME . '.yml';
-    $exported_filename = 'public://exported.' . static::CONFIGNAME . '.yml';
+    drupal_mkdir('public://exported');
+    $exported_filename = 'public://exported/' . static::CONFIGNAME . '.yml';
     \Drupal::config('config_devel.settings')
       ->set('auto_import', array(array(
         'filename' => $filename,
         'hash' => '',
       )))
       ->set('auto_export', array(
-        $exported_filename => static::CONFIGNAME,
+        $exported_filename,
       ))
       ->save();
     $this->storage = \Drupal::service('config.storage');
