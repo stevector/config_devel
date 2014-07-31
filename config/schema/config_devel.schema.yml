@@ -12,4 +12,6 @@ config_devel.settings:
             hash:
               type: string
     auto_export:
-      type: ignore
+      type: sequence
+      sequence:
+        - type: string

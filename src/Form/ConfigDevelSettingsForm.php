@@ -43,7 +43,7 @@ class ConfigDevelSettingsForm extends ConfigFormBase {
     $form['auto_export'] = array(
       '#type' => 'textarea',
       '#title' => $this->t('Auto export'),
-      '#default_value' => implode("\n", array_keys($this->config->get('auto_export'))),
+      '#default_value' => implode("\n", $this->config->get('auto_export')),
       '#description' => $this->t('Automatically export to the files specified. List one file per line.'),
     );
     return parent::buildForm($form, $form_state);
@@ -76,13 +76,9 @@ class ConfigDevelSettingsForm extends ConfigFormBase {
         'hash' => '',
       );
     }
-    $auto_export = array();
-    foreach ($form_state['values']['auto_export'] as $file) {
-      $auto_export[$file] = basename($file, '.' . FileStorage::getFileExtension());
-    }
     $this->config
       ->set('auto_import', $auto_import)
-      ->set('auto_export', $auto_export)
+      ->set('auto_export', $form_state['values']['auto_export'])
       ->save();
     parent::submitForm($form, $form_state);
   }

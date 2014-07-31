@@ -8,6 +8,7 @@
 namespace Drupal\config_devel\EventSubscriber;
 
 use Drupal\Core\Config\Config;
+use Drupal\Core\Config\FileStorage;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Yaml\Exception\DumpException;
 use Drupal\Core\Config\ConfigCrudEvent;
@@ -54,8 +55,9 @@ class ConfigDevelAutoExportSubscriber extends ConfigDevelSubscriberBase implemen
    */
   protected function autoExportConfig(Config $config) {
     $config_name = $config->getName();
-    $auto_export = $this->getSettings()->get('auto_export');
-    $file_names = array_keys(array_intersect($auto_export, array($config_name)));
+    $file_names = array_filter($this->getSettings()->get('auto_export'), function ($file_name) use ($config_name) {
+      return basename($file_name, '.' . FileStorage::getFileExtension()) == $config_name;
+    });
     $this->writeBackConfig($config, $file_names);
   }
 
