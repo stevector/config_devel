@@ -9,6 +9,8 @@ namespace Drupal\config_devel\Form;
 
 use Drupal\Core\Config\FileStorage;
 use Drupal\Core\Form\ConfigFormBase;
+use Drupal\Core\Form\FormState;
+use Drupal\Core\Form\FormStateInterface;
 
 /**
  * Settings form for config devel.
@@ -28,7 +30,7 @@ class ConfigDevelSettingsForm extends ConfigFormBase {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, array &$form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state) {
     $this->config = $this->configFactory()->get('config_devel.settings');
     $default_value = '';
     foreach ($this->config->get('auto_import') as $file) {
@@ -52,9 +54,9 @@ class ConfigDevelSettingsForm extends ConfigFormBase {
   /**
    * {@inheritdoc}
    */
-  public function validateForm(array &$form, array &$form_state) {
+  public function validateForm(array &$form, FormStateInterface $form_state) {
     foreach (array('auto_import', 'auto_export') as $key) {
-      $form_state['values'][$key] = array_filter(preg_split("/\r\n/", $form_state['values'][$key]));
+      $form_state['values'][$key] = array_filter(preg_split("/\r\n/", $form_state->getValues()[$key]));
     }
     foreach ($form_state['values']['auto_import'] as $file) {
       $name = basename($file, '.' . FileStorage::getFileExtension());
@@ -68,9 +70,9 @@ class ConfigDevelSettingsForm extends ConfigFormBase {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, array &$form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state) {
     $auto_import = array();
-    foreach ($form_state['values']['auto_import'] as $file) {
+    foreach ($form_state->getValues()['auto_import'] as $file) {
       $auto_import[] = array(
         'filename' => $file,
         'hash' => '',
@@ -78,7 +80,7 @@ class ConfigDevelSettingsForm extends ConfigFormBase {
     }
     $this->config
       ->set('auto_import', $auto_import)
-      ->set('auto_export', $form_state['values']['auto_export'])
+      ->set('auto_export', $form_state->getValues()['auto_export'])
       ->save();
     parent::submitForm($form, $form_state);
   }
