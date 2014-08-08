@@ -23,7 +23,7 @@ function config_devel_drush_command() {
   $description .= "  - entity.view_display.node.article.teaser"  . "\n";
   $description .= "  - field.instance.node.article.body"  . "\n";
 
-  $items['config-writeback'] = array(
+  $items['config-devel-export-module'] = array(
     'description' => $description,
     'arguments' => array(
       'module' => 'Module machine name.',
@@ -31,9 +31,9 @@ function config_devel_drush_command() {
     'options' => array(
     ),
     'examples' => array(
-      'drush config-writeback MODULE_NAME' => 'Write back configuration to the specified module, based on .info file.',
+      'drush config-devel-export-module MODULE_NAME' => 'Write back configuration to the specified module, based on .info file.',
     ),
-    'aliases' => array('cwb'),
+    'aliases' => array('cd-em'),
   );
 
   return $items;
@@ -43,7 +43,7 @@ function config_devel_drush_command() {
 /**
  * Drush command callback.
  */
-function drush_config_devel_config_writeback($module = NULL) {
+function drush_config_devel_export_module($module = NULL) {
 
   if ($module && \Drupal::moduleHandler()->moduleExists($module)) {
     $filename = drupal_get_path('module', $module) . '/' . $module .'.info.yml';
