@@ -23,7 +23,7 @@ class ConfigDevelAutoExportSubscriberTest extends ConfigDevelTestBase {
    */
   public function testWriteBackConfig() {
     $config_data = array(
-      'id' => $this->randomName(),
+      'id' => $this->randomMachineName(),
       'langcode' => 'en',
       'uuid' => '836769f4-6791-402d-9046-cc06e20be87f',
     );
@@ -33,14 +33,14 @@ class ConfigDevelAutoExportSubscriberTest extends ConfigDevelTestBase {
       ->getMock();
     $config->expects($this->any())
       ->method('getName')
-      ->will($this->returnValue($this->randomName()));
+      ->will($this->returnValue($this->randomMachineName()));
     $config->expects($this->any())
       ->method('get')
       ->will($this->returnValue($config_data));
 
     $file_names = array(
-      vfsStream::url('public://' . $this->randomName() . '.yml'),
-      vfsStream::url('public://' . $this->randomName() . '.yml'),
+      vfsStream::url('public://' . $this->randomMachineName() . '.yml'),
+      vfsStream::url('public://' . $this->randomMachineName() . '.yml'),
     );
 
     $configDevelSubscriber = new ConfigDevelAutoExportSubscriber($this->configFactory, $this->configManager, $this->fileStorage);
