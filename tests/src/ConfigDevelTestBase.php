@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\config_devel\Tests\ConfigDevelTestBase.
+ * Contains \Drupal\Tests\config_devel\ConfigDevelTestBase.
  */
 
-namespace Drupal\config_devel\Tests;
+namespace Drupal\Tests\config_devel;
 
 use org\bovigo\vfs\vfsStream;
 use Drupal\Tests\UnitTestCase;
