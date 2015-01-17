@@ -27,5 +27,4 @@ class ConfigDevelSubscriberRawTest extends ConfigDevelSubscriberTestBase {
     $this->assertIdentical($data, $exported_data);
   }
 
-
 }

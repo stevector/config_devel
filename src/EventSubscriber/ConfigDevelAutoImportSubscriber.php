@@ -46,7 +46,7 @@ class ConfigDevelAutoImportSubscriber extends ConfigDevelSubscriberBase implemen
           $entity_storage->save($entity);
         }
         else {
-          $this->configFactory->get($config_name)->setData($data)->save();
+          $this->configFactory->getEditable($config_name)->setData($data)->save();
         }
       }
     }

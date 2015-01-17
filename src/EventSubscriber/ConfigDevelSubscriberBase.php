@@ -74,7 +74,7 @@ class ConfigDevelSubscriberBase {
    * @return \Drupal\Core\Config\Config
    */
   protected function getSettings() {
-    return $this->configFactory->get('config_devel.settings');
+    return $this->configFactory->getEditable('config_devel.settings');
   }
 
 }

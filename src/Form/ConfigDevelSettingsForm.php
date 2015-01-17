@@ -9,7 +9,6 @@ namespace Drupal\config_devel\Form;
 
 use Drupal\Core\Config\FileStorage;
 use Drupal\Core\Form\ConfigFormBase;
-use Drupal\Core\Form\FormState;
 use Drupal\Core\Form\FormStateInterface;
 
 /**
@@ -18,9 +17,9 @@ use Drupal\Core\Form\FormStateInterface;
 class ConfigDevelSettingsForm extends ConfigFormBase {
 
   /**
-   * @var \Drupal\Core\Config\Config
+   * Name of the config being edited.
    */
-  protected $config;
+  const CONFIGNAME = 'config_devel.settings';
 
   /**
    * @var array
@@ -31,9 +30,8 @@ class ConfigDevelSettingsForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
-    $this->config = $this->configFactory()->get('config_devel.settings');
     $default_value = '';
-    foreach ($this->config->get('auto_import') as $file) {
+    foreach ($this->config(static::CONFIGNAME)->get('auto_import') as $file) {
       $default_value .= $file['filename'] . "\n";
     }
     $form['auto_import'] = array(
@@ -45,7 +43,7 @@ class ConfigDevelSettingsForm extends ConfigFormBase {
     $form['auto_export'] = array(
       '#type' => 'textarea',
       '#title' => $this->t('Auto export'),
-      '#default_value' => implode("\n", $this->config->get('auto_export')),
+      '#default_value' => implode("\n", $this->config(static::CONFIGNAME)->get('auto_export')),
       '#description' => $this->t('Automatically export to the files specified. List one file per line.'),
     );
     return parent::buildForm($form, $form_state);
@@ -56,12 +54,12 @@ class ConfigDevelSettingsForm extends ConfigFormBase {
    */
   public function validateForm(array &$form, FormStateInterface $form_state) {
     foreach (array('auto_import', 'auto_export') as $key) {
-      $form_state['values'][$key] = array_filter(preg_split("/\r\n/", $form_state->getValues()[$key]));
+      $form_state->setValue($key, array_filter(preg_split("/\r\n/", $form_state->getValues()[$key])));
     }
-    foreach ($form_state['values']['auto_import'] as $file) {
+    foreach ($form_state->getValues()['auto_import'] as $file) {
       $name = basename($file, '.' . FileStorage::getFileExtension());
       if (in_array($name, array('system.site', 'core.extension', 'simpletest.settings'))) {
-        $this->setFormError($this->t('@name is not compatible with this module', array('@name' => $name)), $form_state);
+        $form_state->setErrorByName('auto_import', $this->t('@name is not compatible with this module', array('@name' => $name)));
       }
     }
     parent::validateForm($form, $form_state);
@@ -78,7 +76,7 @@ class ConfigDevelSettingsForm extends ConfigFormBase {
         'hash' => '',
       );
     }
-    $this->config
+    $this->config(static::CONFIGNAME)
       ->set('auto_import', $auto_import)
       ->set('auto_export', $form_state->getValues()['auto_export'])
       ->save();
@@ -91,6 +89,13 @@ class ConfigDevelSettingsForm extends ConfigFormBase {
    */
   public function getFormId() {
     return 'config_devel_settings';
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function getEditableConfigNames() {
+    return ['config_devel.settings'];
   }
 
 }

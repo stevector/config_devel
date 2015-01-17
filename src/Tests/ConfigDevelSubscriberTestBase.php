@@ -45,7 +45,7 @@ abstract class ConfigDevelSubscriberTestBase extends KernelTestBase {
     $filename = vfsStream::url('public://'. static::CONFIGNAME . '.yml');
     drupal_mkdir(vfsStream::url('public://exported'));
     $exported_filename = vfsStream::url('public://exported/' . static::CONFIGNAME . '.yml');
-    \Drupal::config('config_devel.settings')
+    \Drupal::configFactory()->getEditable('config_devel.settings')
       ->set('auto_import', array(array(
         'filename' => $filename,
         'hash' => '',

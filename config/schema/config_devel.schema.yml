@@ -15,3 +15,9 @@ config_devel.settings:
       type: sequence
       sequence:
         - type: string
+config_devel.test:
+  type: mapping
+  label: config devel test
+  mapping:
+    label:
+      type: label
