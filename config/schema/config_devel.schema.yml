@@ -1,5 +1,5 @@
 config_devel.settings:
-  type: mapping
+  type: config_object
   label: config devel settings
   mapping:
     auto_import:
@@ -16,7 +16,7 @@ config_devel.settings:
       sequence:
         - type: string
 config_devel.test:
-  type: mapping
+  type: config_object
   label: config devel test
   mapping:
     label:

@@ -11,7 +11,6 @@ namespace Drupal\config_devel\EventSubscriber;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Config\ConfigManagerInterface;
 use Drupal\Core\Config\Entity\ConfigEntityStorageInterface;
-use Drupal\Core\Config\FileStorage;
 
 class ConfigDevelSubscriberBase {
 
@@ -30,13 +29,6 @@ class ConfigDevelSubscriberBase {
   protected $configManager;
 
   /**
-   * The config file storage service.
-   *
-   * @var \Drupal\Core\Config\FileStorage
-   */
-  protected $fileStorage;
-
-  /**
    * Constructs the ConfigDevelAutoExportSubscriber object.
    *
    * @param \Drupal\Core\Config\ConfigFactory $config_factory
@@ -44,10 +36,9 @@ class ConfigDevelSubscriberBase {
    * @param \Drupal\Core\Config\ConfigManagerInterface $config_manager
    *   The configuration manager.
    */
-  public function __construct(ConfigFactoryInterface $config_factory, ConfigManagerInterface $config_manager, FileStorage $file_storage) {
+  public function __construct(ConfigFactoryInterface $config_factory, ConfigManagerInterface $config_manager) {
     $this->configFactory = $config_factory;
     $this->configManager = $config_manager;
-    $this->fileStorage = $file_storage;
   }
 
   /**

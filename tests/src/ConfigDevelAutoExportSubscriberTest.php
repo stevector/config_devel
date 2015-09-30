@@ -43,7 +43,7 @@ class ConfigDevelAutoExportSubscriberTest extends ConfigDevelTestBase {
       vfsStream::url('public://' . $this->randomMachineName() . '.yml'),
     );
 
-    $configDevelSubscriber = new ConfigDevelAutoExportSubscriber($this->configFactory, $this->configManager, $this->fileStorage);
+    $configDevelSubscriber = new ConfigDevelAutoExportSubscriber($this->configFactory, $this->configManager);
     $configDevelSubscriber->writeBackConfig($config, $file_names);
 
     $data = $config_data;

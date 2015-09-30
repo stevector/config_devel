@@ -2,12 +2,13 @@
 
 /**
  * @file
- * Contains \Drupal\config_devel\EventSubscriber\ConfigDevelReinstallSubscriber.
+ * Contains \Drupal\config_devel\EventSubscriber\ConfigDevelAutoImportSubscriber.
  */
 
 namespace Drupal\config_devel\EventSubscriber;
 
 use Drupal\Component\Utility\Crypt;
+use Drupal\Core\Config\InstallStorage;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
 
@@ -28,7 +29,7 @@ class ConfigDevelAutoImportSubscriber extends ConfigDevelSubscriberBase implemen
       if ($hash != $file['hash']) {
         $changed = TRUE;
         $config->set("auto_import.$key.hash", $hash);
-        $data = $this->fileStorage->decode($contents);
+        $data = (new InstallStorage())->decode($contents);
         $config_name = basename($file['filename'], '.yml');
         $entity_type_id = $this->configManager->getEntityTypeIdByName($config_name);
         if ($entity_type_id) {

@@ -2,13 +2,14 @@
 
 /**
  * @file
- * Contains Drupal\config_devel\EventSubscriber\ConfigDevelFileStorageSubscriber.
+ * Contains Drupal\config_devel\EventSubscriber\ConfigDevelAutoExportSubscriber.
  */
 
 namespace Drupal\config_devel\EventSubscriber;
 
 use Drupal\Core\Config\Config;
 use Drupal\Core\Config\FileStorage;
+use Drupal\Core\Config\InstallStorage;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Yaml\Exception\DumpException;
 use Drupal\Core\Config\ConfigCrudEvent;
@@ -16,7 +17,7 @@ use Drupal\Core\Config\ConfigRenameEvent;
 use Drupal\Core\Config\ConfigEvents;
 
 /**
- * ConfigDevelFileStorageSubscriber subscriber for configuration CRUD events.
+ * ConfigDevelAutoExportSubscriber subscriber for configuration CRUD events.
  */
 class ConfigDevelAutoExportSubscriber extends ConfigDevelSubscriberBase implements EventSubscriberInterface {
 
@@ -78,7 +79,7 @@ class ConfigDevelAutoExportSubscriber extends ConfigDevelSubscriberBase implemen
       }
       foreach ($file_names as $file_name) {
         try {
-          file_put_contents($file_name, $this->fileStorage->encode($data));
+          file_put_contents($file_name, (new InstallStorage())->encode($data));
         }
         catch (DumpException $e) {
           // Do nothing. What could we do?

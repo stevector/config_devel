@@ -26,11 +26,6 @@ abstract class ConfigDevelTestBase extends UnitTestCase {
   protected $configManager;
 
   /**
-   * @var \Drupal\Core\Config\FileStorage|\PHPUnit_Framework_MockObject_MockObject
-   */
-  protected $fileStorage;
-
-  /**
    * {@inheritdoc}
    */
   public function setUp() {
@@ -41,13 +36,6 @@ abstract class ConfigDevelTestBase extends UnitTestCase {
     $this->configManager->expects($this->any())
       ->method('getEntityTypeIdByName')
       ->will($this->returnArgument(0));
-
-    $this->fileStorage = $this->getMockBuilder('Drupal\Core\Config\FileStorage')
-      ->disableOriginalConstructor()
-      ->getMock();
-    $this->fileStorage->expects($this->any())
-      ->method('encode')
-      ->will($this->returnCallback('Drupal\Component\Serialization\Yaml::encode'));
 
     vfsStream::setup('public://');
   }
