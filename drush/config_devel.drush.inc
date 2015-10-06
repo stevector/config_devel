@@ -50,12 +50,36 @@ function drush_config_devel_export_module($module = NULL) {
     $info = \Drupal::service('info_parser')->parse($filename);
 
     if (isset($info['config_devel'])) {
-      foreach ($info['config_devel'] as $name) {
-        $config = \Drupal::config($name);
-        $config_path = drupal_get_path('module', $module) . '/' . InstallStorage::CONFIG_INSTALL_DIRECTORY;
-        $file_names = array($config_path . '/' . $name . '.yml');
-        \Drupal::service('config_devel.writeback_subscriber')->writeBackConfig($config, $file_names);
+
+      // Keep backwards compatibility for the old format.
+      if (!isset($info['config_devel']['install'])) {
+        $info['config_devel']['install'] = $info['config_devel'];
+      }
+      drush_config_devel_process_config($info['config_devel']['install'], $module, InstallStorage::CONFIG_INSTALL_DIRECTORY);
+
+      // If we have any optional configuration, process that as well.
+      if (isset($info['config_devel']['optional'])) {
+        drush_config_devel_process_config($info['config_devel']['optional'], $module, InstallStorage::CONFIG_OPTIONAL_DIRECTORY);
       }
     }
+  }
+}
+
+/**
+ * Exports a list of configuration entities.
+ *
+ * @param array $config_list
+ *   An array of configuration entities.
+ * @param string $module
+ *   The module we're exporting configuration for.
+ * @param string $directory
+ *   The directory we're exporting to.
+ */
+function drush_config_devel_process_config($config_list, $module, $directory) {
+  foreach ($config_list as $name) {
+    $config = \Drupal::config($name);
+    $config_path = drupal_get_path('module', $module) . "/$directory";
+    $file_names = array($config_path . '/' . $name . '.yml');
+    \Drupal::service('config_devel.writeback_subscriber')->writeBackConfig($config, $file_names);
   }
 }
