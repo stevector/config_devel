@@ -55,7 +55,7 @@ class ConfigDevelAutoImportSubscriber extends ConfigDevelSubscriberBase implemen
     $needs_import = TRUE;
     if ($original_hash) {
       $hash = Crypt::hashBase64($contents);
-      if ($hash == $file['hash']) {
+      if ($hash == $original_hash) {
         $needs_import = FALSE;
       }
     }
