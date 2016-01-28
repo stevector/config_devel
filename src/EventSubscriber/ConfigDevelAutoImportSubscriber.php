@@ -69,6 +69,7 @@ class ConfigDevelAutoImportSubscriber extends ConfigDevelSubscriberBase implemen
         $entity_type = $entity_storage->getEntityType();
         $id_key = $entity_type->getKey('id');
         $data[$id_key] = $entity_id;
+        /** @var \Drupal\Core\Config\Entity\ConfigEntityInterface $entity */
         $entity = $entity_storage->create($data);
         if ($existing_entity = $entity_storage->load($entity_id)) {
           $entity
