@@ -37,6 +37,20 @@ function config_devel_drush_command() {
     'aliases' => array('cde', 'cd-em'),
   );
 
+  $items['config-devel-import-one'] = array(
+    'description' => $description,
+    'arguments' => array(
+      'path' => 'Config file name.',
+    ),
+    'options' => array(
+    ),
+    'required-arguments' => TRUE,
+    'examples' => array(
+      'drush config-devel-import-one system.site.yml' => 'Import the contents of system.site.yml into the config object system.site.',
+    ),
+    'aliases' => array('cdi1', 'cd-i1'),
+  );
+
   return $items;
 }
 
@@ -64,6 +78,13 @@ function drush_config_devel_export($extension) {
       }
     }
   }
+}
+
+/**
+ * Drush command callback.
+ */
+function drush_config_devel_import_one($path) {
+  \Drupal::service('config_devel.auto_import_subscriber')->importOne($path);
 }
 
 /**
