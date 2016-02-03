@@ -59,9 +59,19 @@ function config_devel_drush_command() {
  * Drush command callback.
  */
 function drush_config_devel_export($extension) {
+  // Determine the type of extension we're dealing with.
+  $type = NULL;
+  if (\Drupal::moduleHandler()->moduleExists($extension)) {
+    $type = 'module';
+  }
+  elseif (\Drupal::service('theme_handler')->themeExists($extension)) {
+    $type = 'theme';
+  }
+  elseif (drupal_get_profile() === $extension) {
+    $type = 'profile';
+  }
 
-  if (($module_exists = \Drupal::moduleHandler()->moduleExists($extension)) || \Drupal::service('theme_handler')->themeExists($extension)) {
-    $type = $module_exists ? 'module' : 'theme';
+  if ($type) {
     $filename = drupal_get_path($type, $extension) . '/' . $extension .'.info.yml';
     $info = \Drupal::service('info_parser')->parse($filename);
 
@@ -77,6 +87,9 @@ function drush_config_devel_export($extension) {
         drush_config_devel_process_config($info['config_devel']['optional'], $type, $extension, InstallStorage::CONFIG_OPTIONAL_DIRECTORY);
       }
     }
+  }
+  else {
+    drush_set_error("Couldn't export configuration. The '$extension' extension is not enabled.");
   }
 }
 
