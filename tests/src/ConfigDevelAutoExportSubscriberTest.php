@@ -48,6 +48,7 @@ class ConfigDevelAutoExportSubscriberTest extends ConfigDevelTestBase {
 
     $data = $config_data;
     unset($data['uuid']);
+    unset($data['_core']);
 
     foreach ($file_names as $file_name) {
       $this->assertEquals($data, Yaml::decode(file_get_contents($file_name)));

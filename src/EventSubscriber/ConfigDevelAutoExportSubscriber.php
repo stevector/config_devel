@@ -76,6 +76,7 @@ class ConfigDevelAutoExportSubscriber extends ConfigDevelSubscriberBase implemen
       $config_name = $config->getName();
       if ($entity_type_id = $this->configManager->getEntityTypeIdByName($config_name)) {
         unset($data['uuid']);
+        unset($data['_core']);
       }
       foreach ($file_names as $file_name) {
         try {
