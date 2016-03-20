@@ -97,6 +97,13 @@ function drush_config_devel_export($extension) {
  * Drush command callback.
  */
 function drush_config_devel_import_one($path) {
+  if (!file_exists($path) && !empty($_SERVER['PWD'])) {
+    $path = $_SERVER['PWD'] . '/' . trim($path, '/');
+  }
+  if (!file_exists($path)) {
+    drush_log('file not found', 'error');
+    exit;
+  }
   \Drupal::service('config_devel.auto_import_subscriber')->importOne($path);
 }
 
