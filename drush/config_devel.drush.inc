@@ -47,6 +47,7 @@ function config_devel_drush_command() {
     'required-arguments' => TRUE,
     'examples' => array(
       'drush config-devel-import-one system.site.yml' => 'Import the contents of system.site.yml into the config object system.site.',
+      'drush config-devel-import-one system.site' => 'Import the standard input into the config object system.site. Helpful for scripting copying to remote',
     ),
     'aliases' => array('cdi1', 'cd-i1'),
   );
@@ -107,8 +108,7 @@ function drush_config_devel_import_one($path) {
     }
   }
   if ($contents || file_exists($path)) {
-    \Drupal::service('config_devel.auto_import_subscriber')
-      ->importOne($path, '', $contents);
+    \Drupal::service('config_devel.auto_import_subscriber')->importOne($path, '', $contents);
   }
   else {
     drush_log('file not found', 'error');
