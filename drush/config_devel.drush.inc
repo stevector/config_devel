@@ -97,19 +97,23 @@ function drush_config_devel_export($extension) {
  * Drush command callback.
  */
 function drush_config_devel_import_one($path) {
-  if ($path === '-') {
-    $path = 'php://stdin';
-  }
-  else {
-    if (!file_exists($path) && !empty($_SERVER['PWD'])) {
+  $contents = '';
+  if (!file_exists($path)) {
+    if (substr($path, 0, -4) != '.yml') {
+      $contents = file_get_contents('php://stdin');
+    }
+    elseif (!empty($_SERVER['PWD'])) {
       $path = $_SERVER['PWD'] . '/' . trim($path, '/');
     }
-    if (!file_exists($path)) {
-      drush_log('file not found', 'error');
-      exit;
-    }
   }
-  \Drupal::service('config_devel.auto_import_subscriber')->importOne($path);
+  if ($contents || file_exists($path)) {
+    \Drupal::service('config_devel.auto_import_subscriber')
+      ->importOne($path, '', $contents);
+  }
+  else {
+    drush_log('file not found', 'error');
+    exit;
+  }
 }
 
 /**
