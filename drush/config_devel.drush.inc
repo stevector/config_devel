@@ -127,7 +127,7 @@ function drush_config_devel_import($extension) {
 function drush_config_devel_import_one($path) {
   $contents = '';
   if (!file_exists($path)) {
-    if (substr($path, 0, -4) != '.yml') {
+    if (substr($path, -4) != '.yml') {
       $contents = file_get_contents('php://stdin');
     }
     elseif (!empty($_SERVER['PWD'])) {
