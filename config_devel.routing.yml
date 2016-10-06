@@ -5,3 +5,10 @@ config_devel.settings:
     _title: 'Config Devel'
   requirements:
     _permission: 'import configuration'
+config_devel.disk_export:
+  path: 'admin/config/development/configuration/disk/export'
+  defaults:
+    _form: '\Drupal\config_devel\Form\ConfigDevelDiskExport'
+    _title: 'Export to disk'
+  requirements:
+    _permission: 'export configuration'

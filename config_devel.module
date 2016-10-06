@@ -1,0 +1,22 @@
+<?php
+
+/**
+ * @file
+ * Contains config_devel.module..
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_help().
+ */
+function config_devel_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    case 'config_devel.disk_export':
+      $output = '';
+      $output .= '<p>' . t('Export full configuration of this site to the configuration directory on the filesystem.') . '</p>';
+      return $output;
+
+    default:
+  }
+}

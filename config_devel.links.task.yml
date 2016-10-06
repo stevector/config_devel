@@ -1,0 +1,4 @@
+config_devel.disk_export:
+  route_name: config_devel.disk_export
+  title: Full archive to disk
+  parent_id: config.export
